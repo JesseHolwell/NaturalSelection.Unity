@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class life : MonoBehaviour
@@ -18,36 +19,39 @@ public class life : MonoBehaviour
         { 100, 7.8 }
     };
 
+    public GameObject child;
+    public GameObject egg;
+    //public GameObject uiText;
+
+    //private text textScript;
+
     private Rigidbody2D rb2d;
     private SpriteRenderer sprite;
 
-    public GameObject child;
-    public GameObject egg;
-
     private float TimeStep = 1;
 
-    private Vector3 Waypoint;
+    internal Vector3 Waypoint;
 
-    private float Age = 0;
-    private float Energy = 50;
+    internal float Age = 0;
+    internal float Energy = 50;
     private float BaseSpeed = 0.15f;
-    private readonly int Metabolism = 1;
-    private int Size = 1;
+    private readonly float Metabolism = 0.01f;
+    internal int Size = 1;
 
     private readonly int FoodEnergy = 50;
     private readonly int MinEnergyToReproduce = 85;
     private readonly int MinEnergyToSearchForFood = 75;
 
-    private int VisionDistance = 2;
+    private int VisionDistance = 100;
 
-    private bool IsMale;
-    private bool IsPregnant = false;
+    internal bool IsMale;
+    internal bool IsPregnant = false;
 
     private float AgeImpregnated = 0;
-    private readonly int GestationTime = 1;
+    private readonly int GestationTime = 2;
 
     private float LastReproduced = 0;
-    private readonly int ReproductionDelay = 0;
+    private readonly int ReproductionDelay = 1;
     private readonly int ReproductionCost = 50;
 
     private readonly int MinFertilityAge = MaxAge * 25 / 100;
@@ -56,9 +60,22 @@ public class life : MonoBehaviour
     private readonly float spawnBoundaryX = 15.0f;
     private readonly float spawnBoundaryY = 10.0f;
 
-    private static readonly int MaxAge = 20;
+    private static readonly int MaxAge = 50;
 
     private float growthRate = 0.002f;
+
+    internal LifeState State;
+
+    internal Color color;
+    internal life parent;
+
+    internal enum LifeState
+    {
+        Dying,
+        Satisfied,
+        Hungry,
+        Horny,    
+    }
 
 
 
@@ -75,18 +92,19 @@ public class life : MonoBehaviour
     //wants
     //biological
 
-    protected bool IsFertile
+    internal bool IsFertile
     {
         get
         {
-            return Age > MinFertilityAge
+            return Energy > MinEnergyToSearchForFood
+                && Age > MinFertilityAge
                 && Age < MaxFertilityAge
                 && !IsPregnant
                 && Age > LastReproduced + ReproductionDelay;
         }
     }
 
-    private float Speed
+    internal float Speed
     {
         get
         {
@@ -99,12 +117,56 @@ public class life : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
 
+        //uiText = GameObject.Find("text"); // FindGameObjectsWithTag("Text").FirstOrDefault().GetComponent<text>();
+        //textScript = uiText.gameObject.find <text>();
+
         Age = Random.Range(0, 8);
         IsMale = Random.Range(0, 2) == 1;
+
+        SetColor();
+
+    }
+
+    private void SetColor()
+    {
+        if (parent == null)
+        {
+            color = new Color(0.5f, 0.5f, 0.5f, 1);
+            sprite.color = color;
+        }
+        else
+        {
+            var tempColor = parent.color;
+            tempColor.r += Random.Range(-0.2f, 0.2f);
+            tempColor.g += Random.Range(-0.2f, 0.2f);
+            tempColor.b += Random.Range(-0.2f, 0.2f);
+            color = tempColor;
+            sprite.color = color;
+        }
     }
 
     private void Update()
     {
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Debug.Log("Pressed primary button.");
+        //    Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        //    RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
+
+        //    if (hit)
+        //    {
+        //        textScript.selected = hit.transform.gameObject.GetComponent<life>();
+
+        //        Debug.Log(hit.transform.name);
+        //        //return ;
+        //    }
+        //    else
+        //    {
+        //        textScript.selected = null;
+        //    }
+
+        //}
+
         //priorities:
         //Die
         //Lay Egg
@@ -115,9 +177,9 @@ public class life : MonoBehaviour
 
         //wants to lay
 
-        if (Age >= MaxAge)
+        if (Age >= MaxAge || Energy <= 0)
         {
-            gameObject.SetActive(false); //todo: better destroy
+            Destroy();
         }
         else if (IsPregnant
             && Energy > MinEnergyToReproduce
@@ -127,22 +189,23 @@ public class life : MonoBehaviour
         }
 
         var foundTarget = false;
-        if (Energy > MinEnergyToSearchForFood
-            && IsFertile
-            && !IsPregnant)
+        if (IsFertile && !IsPregnant)
         {
-            sprite.color = Color.yellow;
+            State = LifeState.Horny;
+            //sprite.color = Color.yellow;
             foundTarget = SeekMate();
         }
         else if (Energy < MinEnergyToSearchForFood)
         {
-            sprite.color = Color.red;
+            State = LifeState.Hungry;
+            //sprite.color = Color.red;
             foundTarget = SeekFood();
         }
         
         if (!foundTarget)
         {
-            sprite.color = Color.green;
+            State = LifeState.Satisfied;
+            //sprite.color = Color.green;
             Wander();
         }
 
@@ -151,13 +214,19 @@ public class life : MonoBehaviour
 
         if (IsPregnant)
         {
-            sprite.color = Color.white;
+            //sprite.color = Color.white;
         }
 
         if (Age > MaxAge - 1)
         {
-            sprite.color = Color.black;
+            State = LifeState.Dying;
+            //sprite.color = Color.black;
         }
+    }
+
+    private void FixedUpdate()
+    {
+      
     }
 
     private bool SeekMate()
@@ -196,7 +265,7 @@ public class life : MonoBehaviour
         {
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
-            if (distance < VisionDistance && curDistance < distance)
+            if (curDistance < VisionDistance && curDistance < distance)
             {
                 closest = go;
                 distance = curDistance;
@@ -218,12 +287,18 @@ public class life : MonoBehaviour
             var critter = go.GetComponent<life>();
             if (critter.IsFertile && critter.IsMale != this.IsMale)
             {
-                Vector3 diff = go.transform.position - position;
-                float curDistance = diff.sqrMagnitude;
-                if (distance < VisionDistance && curDistance < distance)
+                if (Math.Abs(critter.color.r - this.color.r) < .25f
+                    && Math.Abs(critter.color.g - this.color.g) < .25f
+                    && Math.Abs(critter.color.b - this.color.b) < .25f
+                    )
                 {
-                    closest = go;
-                    distance = curDistance;
+                    Vector3 diff = go.transform.position - position;
+                    float curDistance = diff.sqrMagnitude;
+                    if (curDistance < VisionDistance && curDistance < distance)
+                    {
+                        closest = go;
+                        distance = curDistance;
+                    }
                 }
             }
         }
@@ -240,16 +315,16 @@ public class life : MonoBehaviour
             //get a random point within view
             //ensure its within the bounds
             var x = Random.Range(this.transform.position.x - VisionDistance, this.transform.position.x + VisionDistance);
-            //if (x < -spawnBoundaryX)
-            //    x = -spawnBoundaryX;
-            //else if (x > spawnBoundaryX)
-            //    x = spawnBoundaryX;
+            if (x < -spawnBoundaryX)
+                x = -spawnBoundaryX;
+            else if (x > spawnBoundaryX)
+                x = spawnBoundaryX;
 
             var y = Random.Range(this.transform.position.y - VisionDistance, this.transform.position.y + VisionDistance);
-            //if (y < -spawnBoundaryY)
-            //    y = -spawnBoundaryY;
-            //else if (y > spawnBoundaryY) 
-            //    y = spawnBoundaryY;
+            if (y < -spawnBoundaryY)
+                y = -spawnBoundaryY;
+            else if (y > spawnBoundaryY)
+                y = spawnBoundaryY;
 
             Waypoint = new Vector3(x, y, 0);
         }
@@ -265,11 +340,12 @@ public class life : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        //Debug.Log("enter");
         if (collision.gameObject.CompareTag("Food"))
         {
             if (Energy < 75)
             {
-                collision.gameObject.SetActive(false); //todo: better destroy
+                Destroy(collision.gameObject);
                 Energy = 100; //Energy += FoodEnergy;
                 Wander();
             }
@@ -286,16 +362,22 @@ public class life : MonoBehaviour
         }
     }
 
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        //Debug.Log("exit");
+    }
+
     private void Aging()
     {
-        Energy -= (float)Metabolism / 15 * TimeStep;
+        Energy -= Metabolism * Size * 500 * Time.deltaTime; //(float)(Metabolism) * ( Size^3 + VisionDistance) * TimeStep;
+        //Debug.Log(Energy);
         Age += Time.deltaTime * TimeStep;
 
         //grow bigger
-        sprite.transform.localScale
-            = new Vector3(sprite.transform.localScale.x + Time.deltaTime * growthRate * TimeStep,
-                          sprite.transform.localScale.y + Time.deltaTime * growthRate * TimeStep,
-                          sprite.transform.localScale.z);
+        //sprite.transform.localScale
+        //    = new Vector3(sprite.transform.localScale.x + Time.deltaTime * growthRate * TimeStep,
+        //                  sprite.transform.localScale.y + Time.deltaTime * growthRate * TimeStep,
+        //                  sprite.transform.localScale.z);
 
     }
 
@@ -309,16 +391,20 @@ public class life : MonoBehaviour
 
     }
 
-    private void Destroy()
+    private void Destroy(GameObject obj = null)
     {
-        //Create death symbol
+        if (obj == null)
+            obj = this.gameObject;
+
+        obj.SetActive(false);
     }
 
     private void GiveBirth()
     {
         LastReproduced = Age;
         Energy -= ReproductionCost;
-        Instantiate(egg, transform.position, Quaternion.identity);
+        var baby = Instantiate(egg, transform.position, Quaternion.identity);
+        baby.GetComponent<egg>().parent = this;
         IsPregnant = false;
     }
 

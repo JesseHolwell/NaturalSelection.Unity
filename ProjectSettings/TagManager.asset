@@ -7,6 +7,7 @@ TagManager:
   - Food
   - Life
   - Background
+  - Text
   layers:
   - Default
   - TransparentFX

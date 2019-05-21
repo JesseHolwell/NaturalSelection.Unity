@@ -13,7 +13,7 @@ public class world : MonoBehaviour
     private float spawnBoundaryX = 15.0f;
     private float spawnBoundaryY = 10.0f;
 
-    private int LifeSpawnCount = 1;
+    private int LifeSpawnCount = 10;
     private int FoodSpawnCount = 10;
 
     private int ConcurrentLifeTarget = 50;

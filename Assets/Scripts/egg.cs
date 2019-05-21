@@ -6,6 +6,8 @@ public class egg : MonoBehaviour
 {
     public GameObject life;
 
+    internal life parent;
+
     float timeToLife = 5;
     float runningTime = 0;
 
@@ -22,7 +24,8 @@ public class egg : MonoBehaviour
 
         if (runningTime >= timeToLife)
         {
-            Instantiate(life, this.transform.position, Quaternion.identity);
+            var baby = Instantiate(life, this.transform.position, Quaternion.identity);
+            baby.GetComponent<life>().parent = parent;
             this.gameObject.SetActive(false);
         }
     }

@@ -74,7 +74,7 @@ public class life : MonoBehaviour
         Dying,
         Satisfied,
         Hungry,
-        Horny,    
+        Horny,
     }
 
 
@@ -120,52 +120,19 @@ public class life : MonoBehaviour
         //uiText = GameObject.Find("text"); // FindGameObjectsWithTag("Text").FirstOrDefault().GetComponent<text>();
         //textScript = uiText.gameObject.find <text>();
 
-        Age = Random.Range(0, 8);
+        if (parent == null)
+            Age = Random.Range(0, 8);
+
         IsMale = Random.Range(0, 2) == 1;
 
         SetColor();
 
     }
 
-    private void SetColor()
-    {
-        if (parent == null)
-        {
-            color = new Color(0.5f, 0.5f, 0.5f, 1);
-            sprite.color = color;
-        }
-        else
-        {
-            var tempColor = parent.color;
-            tempColor.r += Random.Range(-0.2f, 0.2f);
-            tempColor.g += Random.Range(-0.2f, 0.2f);
-            tempColor.b += Random.Range(-0.2f, 0.2f);
-            color = tempColor;
-            sprite.color = color;
-        }
-    }
+    float scale = 0;
 
     private void Update()
     {
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    Debug.Log("Pressed primary button.");
-        //    Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-        //    RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
-
-        //    if (hit)
-        //    {
-        //        textScript.selected = hit.transform.gameObject.GetComponent<life>();
-
-        //        Debug.Log(hit.transform.name);
-        //        //return ;
-        //    }
-        //    else
-        //    {
-        //        textScript.selected = null;
-        //    }
-
-        //}
 
         //priorities:
         //Die
@@ -179,7 +146,7 @@ public class life : MonoBehaviour
 
         if (Age >= MaxAge || Energy <= 0)
         {
-            Destroy();
+            Destroy(this.gameObject);
         }
         else if (IsPregnant
             && Energy > MinEnergyToReproduce
@@ -192,46 +159,36 @@ public class life : MonoBehaviour
         if (IsFertile && !IsPregnant)
         {
             State = LifeState.Horny;
-            //sprite.color = Color.yellow;
             foundTarget = SeekMate();
         }
         else if (Energy < MinEnergyToSearchForFood)
         {
             State = LifeState.Hungry;
-            //sprite.color = Color.red;
             foundTarget = SeekFood();
         }
-        
+        else
+        {
+            State = LifeState.Satisfied;
+        }
+
         if (!foundTarget)
         {
             State = LifeState.Satisfied;
-            //sprite.color = Color.green;
             Wander();
         }
 
         MoveTowards(Waypoint);
         Aging();
 
-        if (IsPregnant)
-        {
-            //sprite.color = Color.white;
-        }
-
         if (Age > MaxAge - 1)
         {
             State = LifeState.Dying;
-            //sprite.color = Color.black;
         }
-    }
-
-    private void FixedUpdate()
-    {
-      
     }
 
     private bool SeekMate()
     {
-        var closest = GetClosestMate("Life");
+        var closest = GetClosestMate();
 
         if (closest != null)
         {
@@ -275,9 +232,9 @@ public class life : MonoBehaviour
         return closest;
     }
 
-    private GameObject GetClosestMate(string tag)
+    private GameObject GetClosestMate()
     {
-        var objList = GameObject.FindGameObjectsWithTag(tag);
+        var objList = GameObject.FindGameObjectsWithTag("Life");
 
         GameObject closest = null;
         float distance = Mathf.Infinity;
@@ -285,7 +242,7 @@ public class life : MonoBehaviour
         foreach (GameObject go in objList)
         {
             var critter = go.GetComponent<life>();
-            if (critter.IsFertile && critter.IsMale != this.IsMale)
+            if (critter && critter.IsFertile && critter.IsMale != this.IsMale)
             {
                 if (Math.Abs(critter.color.r - this.color.r) < .25f
                     && Math.Abs(critter.color.g - this.color.g) < .25f
@@ -302,8 +259,6 @@ public class life : MonoBehaviour
                 }
             }
         }
-
-        objList.Where(x => x.transform).Select(x=>x.tag);
 
         return closest;
     }
@@ -391,13 +346,13 @@ public class life : MonoBehaviour
 
     }
 
-    private void Destroy(GameObject obj = null)
-    {
-        if (obj == null)
-            obj = this.gameObject;
+    //private void Destroy(GameObject obj = null)
+    //{
+    //    if (obj == null)
+    //        obj = this.gameObject;
 
-        obj.SetActive(false);
-    }
+    //    obj.SetActive(false);
+    //}
 
     private void GiveBirth()
     {
@@ -406,6 +361,31 @@ public class life : MonoBehaviour
         var baby = Instantiate(egg, transform.position, Quaternion.identity);
         baby.GetComponent<egg>().parent = this;
         IsPregnant = false;
+    }
+
+    private void SetColor()
+    {
+        if (parent == null)
+        {
+            scale = Random.Range(0, 256);
+        }
+        else
+        {
+            scale += Random.Range(-65, 64);
+            //tempColor.r += Random.Range(-0.2f, 0.2f);
+            //tempColor.g += Random.Range(-0.2f, 0.2f);
+            //tempColor.b += Random.Range(-0.2f, 0.2f);
+        }
+        //color = MapRainbowColor(scale);
+        color = MapRainbowColor(scale);
+        sprite.color = color;
+
+    }
+
+    private Color MapRainbowColor(float value)
+    {
+        var color = new Color(value, value, value);
+        return color;
     }
 
     public string GetHashCode()

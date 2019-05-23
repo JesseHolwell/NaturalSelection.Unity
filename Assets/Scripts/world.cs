@@ -31,16 +31,6 @@ public class world : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //var lifeList = GameObject.FindGameObjectsWithTag("Life");
-        //if (lifeList.Length < 10)
-        //{
-        //    SpawnFood();
-        //    SpawnFood();
-        //    SpawnFood();
-        //    SpawnFood();
-        //    SpawnFood();
-        //}
-
         if (Time.time > nextActionTime)
         {
             nextActionTime = Time.time + period;
@@ -56,7 +46,8 @@ public class world : MonoBehaviour
 
     void SpawnFood()
     {
-        Vector3 position = new Vector3(Random.Range(-spawnBoundaryX, spawnBoundaryX), Random.Range(-spawnBoundaryY, spawnBoundaryY), 0);
+        //Vector3 position = new Vector3(Random.Range(-spawnBoundaryX, spawnBoundaryX), Random.Range(-spawnBoundaryY, spawnBoundaryY), 0);
+        Vector3 position = new Vector3(Random.Range(-spawnBoundaryX, spawnBoundaryX), spawnBoundaryY, 0);
         Instantiate(food, position, Quaternion.identity);
     }
 }

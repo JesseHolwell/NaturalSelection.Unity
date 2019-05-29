@@ -397,18 +397,18 @@ public class life : MonoBehaviour
             );
 
         }
-        else
-        {
-            var r = (mother.color.r + mother.color.r) / 2;
-            var g = (mother.color.g + mother.color.g) / 2;
-            var b = (mother.color.b + mother.color.b) / 2;
+        //else
+        //{
+        //    var r = (mother.color.r + mother.color.r) / 2;
+        //    var g = (mother.color.g + mother.color.g) / 2;
+        //    var b = (mother.color.b + mother.color.b) / 2;
 
-            color = new Color(
-                r + Random.Range(-0.1f, 0.1f),
-                g + Random.Range(-0.1f, 0.1f),
-                b + Random.Range(-0.1f, 0.1f)
-            );
-        }
+        //    color = new Color(
+        //        r + Random.Range(-0.1f, 0.1f),
+        //        g + Random.Range(-0.1f, 0.1f),
+        //        b + Random.Range(-0.1f, 0.1f)
+        //    );
+        //}
 
         sprite.color = color;
 

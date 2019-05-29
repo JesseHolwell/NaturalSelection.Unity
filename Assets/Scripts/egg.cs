@@ -9,13 +9,18 @@ public class egg : MonoBehaviour
     internal life mother;
     internal life father;
 
+    private SpriteRenderer sprite;
+
     float timeToLife = 5;
     float runningTime = 0;
+
+    Color color;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        sprite = GetComponent<SpriteRenderer>();
+        SetColor();
     }
 
     // Update is called once per frame
@@ -28,7 +33,24 @@ public class egg : MonoBehaviour
             var baby = Instantiate(life, this.transform.position, Quaternion.identity);
             baby.GetComponent<life>().mother = mother;
             baby.GetComponent<life>().father = father;
+            baby.GetComponent<life>().color = color;
             this.gameObject.SetActive(false);
         }
+    }
+
+    private void SetColor()
+    {
+        var r = (mother.color.r + mother.color.r) / 2;
+        var g = (mother.color.g + mother.color.g) / 2;
+        var b = (mother.color.b + mother.color.b) / 2;
+
+        color = new Color(
+            r + Random.Range(-0.1f, 0.1f),
+            g + Random.Range(-0.1f, 0.1f),
+            b + Random.Range(-0.1f, 0.1f)
+        );
+
+        sprite.color = color;
+
     }
 }

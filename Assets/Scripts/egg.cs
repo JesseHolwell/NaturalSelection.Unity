@@ -6,7 +6,8 @@ public class egg : MonoBehaviour
 {
     public GameObject life;
 
-    internal life parent;
+    internal life mother;
+    internal life father;
 
     float timeToLife = 5;
     float runningTime = 0;
@@ -25,7 +26,8 @@ public class egg : MonoBehaviour
         if (runningTime >= timeToLife)
         {
             var baby = Instantiate(life, this.transform.position, Quaternion.identity);
-            baby.GetComponent<life>().parent = parent;
+            baby.GetComponent<life>().mother = mother;
+            baby.GetComponent<life>().father = father;
             this.gameObject.SetActive(false);
         }
     }

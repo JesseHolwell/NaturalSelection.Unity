@@ -21,6 +21,9 @@ public class life : MonoBehaviour
 
     public GameObject child;
     public GameObject egg;
+
+    public Sprite maleSprite;
+    public Sprite femaleSprite;
     //public GameObject uiText;
 
     //private text textScript;
@@ -67,7 +70,10 @@ public class life : MonoBehaviour
     internal LifeState State;
 
     internal Color color;
-    internal life parent;
+    internal life mother;
+    internal life father;
+
+    private life babyDaddy;
 
     internal enum LifeState
     {
@@ -104,6 +110,14 @@ public class life : MonoBehaviour
         }
     }
 
+    internal bool IsNewLife
+    {
+        get
+        {
+            return mother == null && father == null;
+        }
+    }
+
     internal float Speed
     {
         get
@@ -120,16 +134,22 @@ public class life : MonoBehaviour
         //uiText = GameObject.Find("text"); // FindGameObjectsWithTag("Text").FirstOrDefault().GetComponent<text>();
         //textScript = uiText.gameObject.find <text>();
 
-        if (parent == null)
+        if (IsNewLife)
             Age = Random.Range(0, 8);
 
         IsMale = Random.Range(0, 2) == 1;
+        if (IsMale)
+        {
+            sprite.sprite = maleSprite;
+        }
+        else
+        {
+            sprite.sprite = femaleSprite;
+        }
 
         SetColor();
 
     }
-
-    float scale = 0;
 
     private void Update()
     {
@@ -310,6 +330,7 @@ public class life : MonoBehaviour
             if (!IsMale && IsFertile
                 && collision.gameObject.GetComponent<life>().IsMale)
             {
+                babyDaddy = collision.gameObject.GetComponent<life>();
                 IsPregnant = true;
                 AgeImpregnated = Age;
                 Wander();
@@ -359,34 +380,45 @@ public class life : MonoBehaviour
         LastReproduced = Age;
         Energy -= ReproductionCost;
         var baby = Instantiate(egg, transform.position, Quaternion.identity);
-        baby.GetComponent<egg>().parent = this;
+        var eggDna = baby.GetComponent<egg>();
+        eggDna.mother = this;
+        eggDna.father = babyDaddy;
         IsPregnant = false;
     }
 
     private void SetColor()
     {
-        if (parent == null)
+        if (IsNewLife)
         {
-            scale = Random.Range(0, 256);
+            color = new Color(
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f)
+            );
+
         }
         else
         {
-            scale += Random.Range(-65, 64);
-            //tempColor.r += Random.Range(-0.2f, 0.2f);
-            //tempColor.g += Random.Range(-0.2f, 0.2f);
-            //tempColor.b += Random.Range(-0.2f, 0.2f);
+            var r = (mother.color.r + mother.color.r) / 2;
+            var g = (mother.color.g + mother.color.g) / 2;
+            var b = (mother.color.b + mother.color.b) / 2;
+
+            color = new Color(
+                r + Random.Range(-0.1f, 0.1f),
+                g + Random.Range(-0.1f, 0.1f),
+                b + Random.Range(-0.1f, 0.1f)
+            );
         }
-        //color = MapRainbowColor(scale);
-        color = MapRainbowColor(scale);
+
         sprite.color = color;
 
     }
 
-    private Color MapRainbowColor(float value)
-    {
-        var color = new Color(value, value, value);
-        return color;
-    }
+    //private Color MapRainbowColor(float value)
+    //{
+    //    var color = new Color(value, value, value);
+    //    return color;
+    //}
 
     public string GetHashCode()
     {

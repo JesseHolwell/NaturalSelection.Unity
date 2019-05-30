@@ -39,13 +39,13 @@ public class life : MonoBehaviour
     internal float Energy = 50;
     private float BaseSpeed = 0.15f;
     private readonly float Metabolism = 0.01f;
-    internal int Size = 1;
+    internal float Size = 1f;
 
     private readonly int FoodEnergy = 50;
     private readonly int MinEnergyToReproduce = 85;
     private readonly int MinEnergyToSearchForFood = 75;
 
-    private int VisionDistance = 100;
+    private int VisionDistance = 10;
 
     internal bool IsMale;
     internal bool IsPregnant = false;
@@ -206,6 +206,15 @@ public class life : MonoBehaviour
         }
     }
 
+    //int count = 0;
+    //private void FixedUpdate()
+    //{
+    //    //MoveTowards(Waypoint);
+
+    //    Debug.Log(count++);
+
+    //}
+
     private bool SeekMate()
     {
         var closest = GetClosestMate();
@@ -242,7 +251,7 @@ public class life : MonoBehaviour
         {
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
-            if (curDistance < VisionDistance && curDistance < distance)
+            if (curDistance < VisionDistance * 10 && curDistance < distance)
             {
                 closest = go;
                 distance = curDistance;
@@ -271,7 +280,7 @@ public class life : MonoBehaviour
                 {
                     Vector3 diff = go.transform.position - position;
                     float curDistance = diff.sqrMagnitude;
-                    if (curDistance < VisionDistance && curDistance < distance)
+                    if (curDistance < VisionDistance * 10 && curDistance < distance)
                     {
                         closest = go;
                         distance = curDistance;
@@ -308,9 +317,17 @@ public class life : MonoBehaviour
     private void MoveTowards(Vector3 point)
     {
         var heading = Waypoint - this.transform.position;
-        transform.position += heading.normalized * Speed * Time.deltaTime;
+
+        ///Too slow
+        //var position = transform.position + heading.normalized * Speed * Time.deltaTime;
+        //rb2d.MovePosition(position);
+
+        transform.position = Vector3.MoveTowards(transform.position, Waypoint, Speed * Time.deltaTime);
+
+        //transform.Translate(transform.position + heading * Speed * Time.deltaTime);
 
         sprite.flipX = heading.x > 0;
+        
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -354,6 +371,9 @@ public class life : MonoBehaviour
         //    = new Vector3(sprite.transform.localScale.x + Time.deltaTime * growthRate * TimeStep,
         //                  sprite.transform.localScale.y + Time.deltaTime * growthRate * TimeStep,
         //                  sprite.transform.localScale.z);
+
+        Size += Time.deltaTime * growthRate;
+        transform.localScale += new Vector3(Time.deltaTime * growthRate, Time.deltaTime * growthRate, 0);
 
     }
 

@@ -20,25 +20,25 @@ public class text : MonoBehaviour
     {
         UpdateUIText();
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Debug.Log("Pressed primary button.");
-            Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-            RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Debug.Log("Pressed primary button.");
+        //    Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        //    RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
 
-            if (hit)
-            {
-                selected = hit.transform.gameObject.GetComponent<life>();
+        //    if (hit)
+        //    {
+        //        selected = hit.transform.gameObject.GetComponent<life>();
 
-                Debug.Log(hit.transform.name);
-                //return ;
-            }
-            else
-            {
-                //selected = null;
-            }
+        //        Debug.Log(hit.transform.name);
+        //        //return ;
+        //    }
+        //    else
+        //    {
+        //        //selected = null;
+        //    }
 
-        }
+        //}
     }
 
     private void UpdateUIText()

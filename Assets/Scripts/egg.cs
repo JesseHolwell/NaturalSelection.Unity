@@ -45,9 +45,9 @@ public class egg : MonoBehaviour
         var b = (mother.color.b + mother.color.b) / 2;
 
         color = new Color(
-            r + Random.Range(-0.1f, 0.1f),
-            g + Random.Range(-0.1f, 0.1f),
-            b + Random.Range(-0.1f, 0.1f)
+            Mathf.Clamp(r + Random.Range(-0.1f, 0.1f), 0, 1),
+            Mathf.Clamp(g + Random.Range(-0.1f, 0.1f), 0, 1),
+            Mathf.Clamp(b + Random.Range(-0.1f, 0.1f), 0, 1)
         );
 
         sprite.color = color;

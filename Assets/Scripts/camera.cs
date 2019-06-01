@@ -1,33 +1,49 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class camera : MonoBehaviour
 {
-    private float moveSpeed = 1f;
+    public GameObject WorldObj;
+
+    internal life selected;
+    internal text text;
+
+    private float panSpeed = 1f;
     private float zoomSpeed = 10f;
 
     private Camera cameraObj;
 
-    internal life selected;
-    internal text text;
-    public GameObject world;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        cameraObj = this.GetComponent<Camera>();
-        text = world.GetComponent<text>();
+        cameraObj = GetComponent<Camera>();
+        text = WorldObj.GetComponent<text>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         CameraControl();
 
+        MouseControl();
+
+        SetSelected();
+    }
+
+    private void SetSelected()
+    {
+        if (selected != null)
+        {
+            transform.position =
+                new Vector3(selected.transform.position.x,
+                selected.transform.position.y, transform.position.z);
+
+        }
+        text.selected = selected;
+    }
+
+    private void MouseControl()
+    {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Pressed primary button.");
+            //Debug.Log("Pressed primary button.");
             Vector2 rayPos = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
             //Debug.DrawRay(rayPos, Vector2.up, Color.red, 10f);
             RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero, 0f);
@@ -36,38 +52,27 @@ public class camera : MonoBehaviour
             {
                 selected = hit.transform.gameObject.GetComponent<life>();
 
-                Debug.Log("hit");
-                Debug.Log(hit.transform.name);
+                //Debug.Log("hit");
+                //Debug.Log(hit.transform.name);
                 //return ;
-
             }
             else
             {
-                Debug.Log("no hit");
+                //Debug.Log("no hit");
                 //selected = null;
             }
-
         }
-
-        if (selected != null)
-        {
-            this.transform.position =
-                new Vector3(selected.transform.position.x,
-                selected.transform.position.y, this.transform.position.z);
-
-        }
-
-        text.selected = selected;
     }
 
-    void CameraControl()
+    private void CameraControl()
     {
         //FOV: orth camera only
         //but that breaks the click raycast
         //var normalizedMoveSpeed = moveSpeed / cameraObj.fieldOfView / 60;
 
         //perspective:
-        var normalizedMoveSpeed = moveSpeed;
+        var normalizedMoveSpeed = panSpeed;
+        //todo: multiply by orth size to normalize speed;
 
         //up down left right
         // * Time.deltaTime ?
@@ -136,9 +141,6 @@ public class camera : MonoBehaviour
             cameraObj.orthographicSize = 15;
         else if (cameraObj.orthographicSize < 5)
             cameraObj.orthographicSize = 5;
-
-
-
 
     }
 }

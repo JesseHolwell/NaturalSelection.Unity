@@ -1,53 +1,58 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class world : MonoBehaviour
 {
-    public GameObject food;
-    public GameObject lifeSeed;
+    public GameObject Food;
+    public GameObject Life;
 
     //timer for food spawn
-    private float nextActionTime, period = 0.5f; //in seconds
+    private float nextFoodSpawn, foodDelay = 0.5f; //in seconds
 
-    private float spawnBoundaryX = 15.0f;
-    private float spawnBoundaryY = 10.0f;
+    private readonly float spawnBoundaryX = 15.0f;
+    private readonly float spawnBoundaryY = 10.0f;
 
-    private int LifeSpawnCount = 10;
-    private int FoodSpawnCount = 10;
+    private readonly int lifeSpawnCount = 10;
+    private readonly int foodSpawnCount = 10;
 
-    private int ConcurrentLifeTarget = 50;
+    private readonly int concurrentLifeTarget = 50;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        for (var v = 0; v < LifeSpawnCount; v++)
+        SeedWorld();
+    }
+
+    private void Update()
+    {
+        FoodSpawner();
+    }
+
+    private void SeedWorld()
+    {
+        for (var v = 0; v < lifeSpawnCount; v++)
             CreateLife();
 
-        for (var v = 0; v < FoodSpawnCount; v++)
+        for (var v = 0; v < foodSpawnCount; v++)
             SpawnFood();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FoodSpawner()
     {
-        if (Time.time > nextActionTime)
+        if (Time.time > nextFoodSpawn)
         {
-            nextActionTime = Time.time + period;
+            nextFoodSpawn = Time.time + foodDelay;
             SpawnFood();
         }
     }
 
-    void CreateLife()
+    private void CreateLife()
     {
         Vector3 position = new Vector3(Random.Range(-spawnBoundaryX, spawnBoundaryX), Random.Range(-spawnBoundaryY, spawnBoundaryY), 0);
-        Instantiate(lifeSeed, position, Quaternion.identity);
+        Instantiate(Life, position, Quaternion.identity);
     }
 
-    void SpawnFood()
+    private void SpawnFood()
     {
-        //Vector3 position = new Vector3(Random.Range(-spawnBoundaryX, spawnBoundaryX), Random.Range(-spawnBoundaryY, spawnBoundaryY), 0);
         Vector3 position = new Vector3(Random.Range(-spawnBoundaryX, spawnBoundaryX), spawnBoundaryY, 0);
-        Instantiate(food, position, Quaternion.identity);
+        Instantiate(Food, position, Quaternion.identity);
     }
 }

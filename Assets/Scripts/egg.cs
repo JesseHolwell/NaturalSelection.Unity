@@ -1,53 +1,56 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class egg : MonoBehaviour
 {
-    public GameObject life;
+    public GameObject Life;
 
     internal life mother;
     internal life father;
 
-    private SpriteRenderer sprite;
+    private Color color;
 
-    float timeToLife = 5;
-    float runningTime = 0;
+    private float age = 0;
+    private readonly float hatchingTime = 5;
+    private readonly float colorDrift = 0.2f;
 
-    Color color;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        sprite = GetComponent<SpriteRenderer>();
         SetColor();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        runningTime += Time.deltaTime;
+        age += Time.deltaTime;
 
-        if (runningTime >= timeToLife)
+        if (age >= hatchingTime)
         {
-            var baby = Instantiate(life, this.transform.position, Quaternion.identity);
-            baby.GetComponent<life>().mother = mother;
-            baby.GetComponent<life>().father = father;
-            baby.GetComponent<life>().color = color;
-            this.gameObject.SetActive(false);
+            Hatch();
         }
+    }
+
+    private void Hatch()
+    {
+        var baby = Instantiate(Life, transform.position, Quaternion.identity);
+        var life = baby.GetComponent<life>();
+        life.mother = mother;
+        life.father = father;
+        life.color = color;
+
+        gameObject.SetActive(false);
     }
 
     private void SetColor()
     {
-        var r = (mother.color.r + mother.color.r) / 2;
-        var g = (mother.color.g + mother.color.g) / 2;
-        var b = (mother.color.b + mother.color.b) / 2;
+        var sprite = GetComponent<SpriteRenderer>();
+
+        var r = (mother.color.r + father.color.r) / 2;
+        var g = (mother.color.g + father.color.g) / 2;
+        var b = (mother.color.b + father.color.b) / 2;
 
         color = new Color(
-            Mathf.Clamp(r + Random.Range(-0.1f, 0.1f), 0, 1),
-            Mathf.Clamp(g + Random.Range(-0.1f, 0.1f), 0, 1),
-            Mathf.Clamp(b + Random.Range(-0.1f, 0.1f), 0, 1)
+            Mathf.Clamp(r + Random.Range(-colorDrift, colorDrift), 0, 1),
+            Mathf.Clamp(g + Random.Range(-colorDrift, colorDrift), 0, 1),
+            Mathf.Clamp(b + Random.Range(-colorDrift, colorDrift), 0, 1)
         );
 
         sprite.color = color;

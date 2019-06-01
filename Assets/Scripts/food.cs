@@ -1,26 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class food : MonoBehaviour
 {
-    public float gravity;
-    // Start is called before the first frame update
-    void Start()
+    private readonly float Gravity = 1;
+
+    private void Start()
     {
 
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        transform.position += Vector3.down * gravity * Time.deltaTime;
-
+        transform.position += Vector3.down * Gravity * Time.deltaTime;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (other.tag == "Background")
+        //TODO: this doesnt work, istrigger?
+        if (collision.tag == "Background")
         {
             Destroy(this);
         }

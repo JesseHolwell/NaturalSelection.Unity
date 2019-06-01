@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7035185849397492987}
   - component: {fileID: 7786947707993589145}
   m_Layer: 0
-  m_Name: egg
+  m_Name: Egg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,4 +92,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43314eb4255faed47b52014c8ba0023b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  life: {fileID: 6948433696927649504, guid: 155f410bdbb828943beb4928648604a4, type: 3}
+  Life: {fileID: 6948433696927649504, guid: 155f410bdbb828943beb4928648604a4, type: 3}

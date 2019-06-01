@@ -1,21 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class time : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private Slider slider;
+
+    private void Start()
     {
-        
+        slider = GetComponent<Slider>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        var slider = this.GetComponent<Slider>();
         Time.timeScale = slider.value;
         Time.fixedDeltaTime = Time.timeScale;
+
+        //TODO: keyboard controls shouldnt affect the UI element
     }
 }

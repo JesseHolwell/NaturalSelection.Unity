@@ -44,7 +44,9 @@ public class life : MonoBehaviour
     private readonly int MaxFertilityAge = MaxAge * 75 / 100;
 
     private readonly float spawnBoundaryX = 15.0f;
-    private readonly float spawnBoundaryY = 10.0f;
+    private readonly float spawnBoundaryY = 9f;
+    private readonly float spawnZeroX = 15.0f;
+    private readonly float spawnZeroY = 10.0f;
 
     internal Color color;
 
@@ -115,6 +117,8 @@ public class life : MonoBehaviour
         }
     }
 
+
+
     private void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
@@ -125,6 +129,8 @@ public class life : MonoBehaviour
 
         SetGender();
         SetColor();
+
+        swimDelay = Random.Range(0.75f, 1.25f);
     }
 
     private void Update()
@@ -235,12 +241,15 @@ public class life : MonoBehaviour
         Vector3 position = transform.position;
         foreach (GameObject go in objList)
         {
-            Vector3 diff = go.transform.position - position;
-            float curDistance = diff.sqrMagnitude;
-            if (curDistance < VisionDistance * 10 && curDistance < distance)
+            if (go.GetComponent<food>().eatable)
             {
-                closest = go;
-                distance = curDistance;
+                Vector3 diff = go.transform.position - position;
+                float curDistance = diff.sqrMagnitude;
+                if (curDistance < VisionDistance * 10 && curDistance < distance)
+                {
+                    closest = go;
+                    distance = curDistance;
+                }
             }
         }
 
@@ -259,10 +268,10 @@ public class life : MonoBehaviour
             var critter = go.GetComponent<life>();
             if (critter && critter.IsFertile && critter.IsMale != IsMale)
             {
-                if (Math.Abs(critter.color.r - color.r) < .25f
-                    && Math.Abs(critter.color.g - color.g) < .25f
-                    && Math.Abs(critter.color.b - color.b) < .25f
-                    )
+                //if (Math.Abs(critter.color.r - color.r) < .25f
+                //    && Math.Abs(critter.color.g - color.g) < .25f
+                //    && Math.Abs(critter.color.b - color.b) < .25f
+                //    )
                 {
                     Vector3 diff = go.transform.position - position;
                     float curDistance = diff.sqrMagnitude;
@@ -300,15 +309,25 @@ public class life : MonoBehaviour
         }
     }
 
+    private float timeToSwim = 1;
+    private float nextSwim = 0;
+    private float swimDelay;
+
     private void MoveTowards(Vector3 point)
     {
+        if (Time.time > nextSwim)
+        {
+            nextSwim = Time.time + swimDelay;
+        }
+        float modifier = nextSwim - Time.time + 0.25f;
+
         var heading = Waypoint - transform.position;
 
         ///Too slow
         //var position = transform.position + heading.normalized * Speed * Time.deltaTime;
         //rb2d.MovePosition(position);
 
-        transform.position = Vector3.MoveTowards(transform.position, Waypoint, Speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, Waypoint, Speed * modifier * Time.deltaTime);
 
         //transform.Translate(transform.position + heading * Speed * Time.deltaTime);
 
@@ -323,6 +342,7 @@ public class life : MonoBehaviour
         {
             if (Energy < 75)
             {
+                collision.GetComponent<food>().eatable = false;
                 Destroy(collision.gameObject);
                 Energy = 100; //Energy += FoodEnergy;
                 Wander();

@@ -4,6 +4,8 @@ public class food : MonoBehaviour
 {
     private readonly float Gravity = 1;
 
+    internal bool eatable = true;
+
     private void Start()
     {
 
@@ -11,7 +13,8 @@ public class food : MonoBehaviour
 
     private void Update()
     {
-        transform.position += Vector3.down * Gravity * Time.deltaTime;
+        if (eatable)
+            transform.position += Vector3.down * Gravity * Time.deltaTime;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -19,7 +22,7 @@ public class food : MonoBehaviour
         //TODO: this doesnt work, istrigger?
         if (collision.tag == "Background")
         {
-            Destroy(this);
+            Debug.Log("floor");
         }
 
     }

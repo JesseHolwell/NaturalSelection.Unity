@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class text : MonoBehaviour
 {
-    public Text TestObj;
+    public Text TextObj;
     internal life selected;
 
     private void Start()
@@ -33,9 +33,9 @@ public class text : MonoBehaviour
             uiString += $"State:\t{selected.State}\n";
             uiString += $"Color:\t{selected.color}\n";
 
-            TestObj.text = uiString;
+            TextObj.text = uiString;
         }
         else
-            TestObj.text = "";
+            TextObj.text = "";
     }
 }

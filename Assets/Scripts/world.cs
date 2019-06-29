@@ -6,10 +6,10 @@ public class world : MonoBehaviour
     public GameObject Life;
 
     //timer for food spawn
-    private float nextFoodSpawn, foodDelay = 0.5f; //in seconds
+    private float nextFoodSpawn, foodDelay = 1f; //in seconds
 
     private readonly float spawnBoundaryX = 15.0f;
-    private readonly float spawnBoundaryY = 10.0f;
+    private readonly float spawnBoundaryY = 9f;
 
     private readonly int lifeSpawnCount = 10;
     private readonly int foodSpawnCount = 10;

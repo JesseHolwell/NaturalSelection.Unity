@@ -94,10 +94,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2952809e4ce9ac04d96139e684d46a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  child: {fileID: 6948433696927649504}
-  egg: {fileID: 5111334230088640598, guid: 33ab0c0a96f2aa14fbedadde7b8f903c, type: 3}
-  maleSprite: {fileID: 21300000, guid: e547fdb2ca8af0c4bab3f9db4895bcf6, type: 3}
-  femaleSprite: {fileID: 21300000, guid: 41d86a494e343ec439152fa2126525d5, type: 3}
+  Child: {fileID: 6948433696927649504}
+  Egg: {fileID: 5111334230088640598, guid: 33ab0c0a96f2aa14fbedadde7b8f903c, type: 3}
+  MaleSprite: {fileID: 21300000, guid: e547fdb2ca8af0c4bab3f9db4895bcf6, type: 3}
+  FemaleSprite: {fileID: 21300000, guid: 41d86a494e343ec439152fa2126525d5, type: 3}
 --- !u!50 &6948433696927649532
 Rigidbody2D:
   serializedVersion: 4

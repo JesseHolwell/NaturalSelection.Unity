@@ -20,14 +20,16 @@ public class life : MonoBehaviour
     internal Vector3 Waypoint;
 
     internal float Age = 0;
+    private static readonly int MaxAge = 50;
     internal float Energy = 50;
+    private float MaxEnergy = 100;
     internal float Size = 1f;
 
-    private float BaseSpeed = 0.15f;
+    private float BaseSpeed = 1f;
+    private bool IsRunning = false;
     private int VisionDistance = 10;
     private float growthRate = 0.002f;
     private readonly float Metabolism = 0.01f;
-    private static readonly int MaxAge = 50;
 
     private readonly int FoodEnergy = 50;
     private readonly int MinEnergyToReproduce = 85;
@@ -49,6 +51,9 @@ public class life : MonoBehaviour
     private readonly float spawnZeroY = 10.0f;
 
     internal Color color;
+    internal float colorValue;
+    internal float colorSaturation = 0.75f;
+    internal float colorLightness = 0.7f;
 
     internal life mother;
     internal life father;
@@ -113,7 +118,15 @@ public class life : MonoBehaviour
     {
         get
         {
-            return (1 + BaseSpeed * Age) * TimeStep;
+            return (BaseSpeed + BaseSpeed * Age / 20) * TimeStep;
+        }
+    }
+
+    internal float RunSpeed
+    {
+        get
+        {
+            return Speed / TimeStep * 2f * TimeStep;
         }
     }
 
@@ -147,6 +160,7 @@ public class life : MonoBehaviour
         GetNewWaypoint();
 
         MoveTowards(Waypoint);
+
         Aging();
 
         if (Age > MaxAge - 1)
@@ -157,6 +171,7 @@ public class life : MonoBehaviour
 
     private void GetNewWaypoint()
     {
+        bool urgent = true;
         var foundTarget = false;
         if (IsFertile && !IsPregnant)
         {
@@ -175,18 +190,29 @@ public class life : MonoBehaviour
 
         if (!foundTarget)
         {
+            urgent = false;
             State = LifeState.Satisfied;
             Wander();
         }
+
+        IsRunning = urgent;
     }
 
     private void LifeAndDeath()
     {
-        if (Age >= MaxAge || Energy <= 0)
+        if (isDead || Age >= MaxAge || Energy <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
-        else if (IsPregnant
+        //else
+        //{
+        //    //Live();
+        //    //Incase they replenish their energy while dying
+        //ehh now I handle this mechanic through saturation
+        //    sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, 1f);
+        //}
+
+        if (IsPregnant
             && Energy > MinEnergyToReproduce
             && Age > AgeImpregnated + GestationTime)
         {
@@ -272,6 +298,7 @@ public class life : MonoBehaviour
                 //    && Math.Abs(critter.color.g - color.g) < .25f
                 //    && Math.Abs(critter.color.b - color.b) < .25f
                 //    )
+                if (Math.Abs(critter.colorValue - colorValue) < 0.5f)
                 {
                     Vector3 diff = go.transform.position - position;
                     float curDistance = diff.sqrMagnitude;
@@ -327,7 +354,9 @@ public class life : MonoBehaviour
         //var position = transform.position + heading.normalized * Speed * Time.deltaTime;
         //rb2d.MovePosition(position);
 
-        transform.position = Vector3.MoveTowards(transform.position, Waypoint, Speed * modifier * Time.deltaTime);
+        var speed = IsRunning ? RunSpeed : Speed;
+
+        transform.position = Vector3.MoveTowards(transform.position, Waypoint, speed * modifier * Time.deltaTime);
 
         //transform.Translate(transform.position + heading * Speed * Time.deltaTime);
 
@@ -342,9 +371,9 @@ public class life : MonoBehaviour
         {
             if (Energy < 75)
             {
-                collision.GetComponent<food>().eatable = false;
+                //collision.GetComponent<food>().eatable = false;
                 Destroy(collision.gameObject);
-                Energy = 100; //Energy += FoodEnergy;
+                Energy = MaxEnergy; //Energy += FoodEnergy;
                 Wander();
             }
         }
@@ -368,11 +397,20 @@ public class life : MonoBehaviour
 
     private void Aging()
     {
-        Energy -= Metabolism * Size * 500 * Time.deltaTime; //(float)(Metabolism) * ( Size^3 + VisionDistance) * TimeStep;
-        Age += Time.deltaTime * TimeStep;
+        if (!isDead)
+        {
+            Energy -= Metabolism * Size * 500 * Time.deltaTime; //(float)(Metabolism) * ( Size^3 + VisionDistance) * TimeStep;
+            Age += Time.deltaTime * TimeStep;
 
-        Size += Time.deltaTime * growthRate;
-        transform.localScale += new Vector3(Time.deltaTime * growthRate, Time.deltaTime * growthRate, 0);
+            Size += Time.deltaTime * growthRate;
+            transform.localScale += new Vector3(Time.deltaTime * growthRate, Time.deltaTime * growthRate, 0);
+
+            var energyPercentage = Energy / MaxEnergy;
+            var energyNormal = energyPercentage * colorSaturation;
+
+            //sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b);
+            sprite.color = Color.HSVToRGB(colorValue, energyNormal, colorLightness);
+        }
 
     }
 
@@ -405,15 +443,26 @@ public class life : MonoBehaviour
         IsPregnant = false;
     }
 
+    private bool isDead = false;
+    private void Die()
+    {
+        isDead = true;
+        sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, sprite.color.a - 0.1f);
+        if (sprite.color.a < 0)
+            Destroy(this.gameObject);
+    }
+
     private void SetColor()
     {
         if (IsNewLife)
         {
-            color = new Color(
-                Random.Range(0f, 1f),
-                Random.Range(0f, 1f),
-                Random.Range(0f, 1f)
-            );
+            colorValue = Random.Range(0f, 1f);
+            //Debug.Log(colorValue);
+            //color = new Color(
+            //    Random.Range(0f, 1f),
+            //    Random.Range(0f, 1f),
+            //    Random.Range(0f, 1f)
+            //);
 
         }
         //else
@@ -429,6 +478,7 @@ public class life : MonoBehaviour
         //    );
         //}
 
+        color = Color.HSVToRGB(colorValue, colorSaturation, colorLightness);
         sprite.color = color;
 
     }

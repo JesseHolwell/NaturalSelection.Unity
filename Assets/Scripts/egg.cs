@@ -8,9 +8,10 @@ public class egg : MonoBehaviour
     internal life father;
 
     private Color color;
+    private float colorValue;
 
     private float age = 0;
-    private readonly float hatchingTime = 5;
+    private readonly float hatchingTime = 7;
     private readonly float colorDrift = 0.2f;
 
     private void Start()
@@ -34,24 +35,40 @@ public class egg : MonoBehaviour
         var life = baby.GetComponent<life>();
         life.mother = mother;
         life.father = father;
-        life.color = color;
+        life.colorValue = colorValue;
 
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
     private void SetColor()
     {
         var sprite = GetComponent<SpriteRenderer>();
 
-        var r = (mother.color.r + father.color.r) / 2;
-        var g = (mother.color.g + father.color.g) / 2;
-        var b = (mother.color.b + father.color.b) / 2;
+        var mvalue = mother.colorValue;
+        var fvalue = father.colorValue;
 
-        color = new Color(
-            Mathf.Clamp(r + Random.Range(-colorDrift, colorDrift), 0, 1),
-            Mathf.Clamp(g + Random.Range(-colorDrift, colorDrift), 0, 1),
-            Mathf.Clamp(b + Random.Range(-colorDrift, colorDrift), 0, 1)
-        );
+        var min = mvalue < fvalue ? mvalue : fvalue;
+        var max = mvalue > fvalue ? mvalue : fvalue;
+
+        min -= colorDrift;
+        max += colorDrift;
+
+        if (min < 0)
+            min = 0;
+        if (max > 1)
+            max = 1;
+
+        //TODO: bell curve distribution
+        colorValue = Random.Range(min, max);
+
+        //todo: loop numbers around.
+        //so 0.9 is closer to 0.1 than it is to 0.6
+
+        //do math on number
+        //then on number + maxNumber/2
+        //whichever has a smaller value is closer?
+
+        color = Color.HSVToRGB(colorValue, father.colorSaturation, father.colorLightness);
 
         sprite.color = color;
 

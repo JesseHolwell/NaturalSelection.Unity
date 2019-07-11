@@ -29,6 +29,8 @@ public class camera : MonoBehaviour
 
     private void SetSelected()
     {
+        selected = null; //dont follow
+
         if (selected != null)
         {
             transform.position =
